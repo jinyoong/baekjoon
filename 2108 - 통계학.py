@@ -1,48 +1,36 @@
-import sys
+N = int(input())
 
-input = sys.stdin.readline
-
-T = int(input())
-
-num_list = []
-num_sum = 0
-max_num = 0
-min_num = 0
+num_list = [0] * N
 num_dict = {}
+num_sum = 0
+max_num = -4000
+min_num = 4000
 
-for i in range(T):
+for i in range(N):
     temp = int(input())
-    if i == 0:
+    if max_num < temp:
         max_num = temp
+    if min_num > temp:
         min_num = temp
-        num_list.append(temp)
-        num_dict[temp] = 1
-        num_sum += temp
-    else:
-        if temp > max_num:
-            max_num = temp
-        elif temp < min_num:
-            min_num = temp
-        num_list.append(temp)
-        num_sum += temp
-        if temp not in num_dict.keys():
-            num_dict[temp] = 1
-        else:
-            num_dict[temp] += 1
+    num_sum += temp
+    num_list[i] = temp
+    num_dict[temp] = num_dict.get(temp, 0) + 1
+
+many_value = 0
+many_key = []
+for key, value in num_dict.items():
+    if value > many_value:
+        many_value = value
+        many_key = [key]
+        continue
+
+    if value == many_value:
+        many_key.append(key)
+
+many_key.sort()
 
 num_list.sort()
-many_cnt = max(num_dict.values())
-many_nums = []
-for num, cnt in num_dict.items():
-    if cnt == many_cnt:
-        many_nums.append(num)
-
-many_nums.sort()
-
-print('%0.0f' % (num_sum/T))
-print(num_list[T//2])
-if len(many_nums) == 1:
-    print(many_nums[0])
-else:
-    print(many_nums[1])
+print(round(num_sum / N))
+print(num_list[N//2])
+print(many_key[1] if len(many_key) >= 2 else many_key[0])
 print(max_num - min_num)
