@@ -2,28 +2,26 @@ K = int(input())
 
 length_lst = [0, 0, 0, 0, 0, 0]
 distance_lst = [0, 0, 0, 0, 0, 0]
-idx = 0
 answer = 0
 
-# 참외밭은 ㄱ 모양을 회전한 육각형 모양! ㄷ, ㄹ 모양은 나올 수 없다
-for _ in range(6):
+for i in range(6):
     distance, length = map(int, input().split())
 
-    distance_lst[idx] = distance
-    length_lst[idx] = length
-    idx += 1
+    distance_lst[i] = distance
+    length_lst[i] = length
 
 start_idx = 0
 
-for idx, value in enumerate(distance_lst):
-    if distance_lst.count(value) == 1:
-        start_idx = idx
-        break
+for i in range(6):
+    # 가장 긴 변 2개를 이루는 방향은 항상 연속해서 한 번씩만 나오게 되어있다.
+    d1, d2 = distance_lst[i], distance_lst[(i + 1) % 6]
+    if distance_lst.count(d1) == 1 and distance_lst.count(d2) == 1:
+        start_idx = i
 
 original_area = length_lst[start_idx] * length_lst[(start_idx + 1) % 6]
 diff_area = length_lst[(start_idx + 3) % 6] * length_lst[(start_idx + 4) % 6]
 
-print((original_area - diff_area) * K)
+print(int(original_area - diff_area) * K)
 
 """
 7
