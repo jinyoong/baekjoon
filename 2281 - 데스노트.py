@@ -41,29 +41,34 @@ def solution2():
     if n == 1:
         return 0
 
-    result = [[0, 0, 0] for _ in range(n)]
-    result[-1][0] = names[-1]
-    result[-1][1] = 0
-    result[-1][2] = 1
+    result = [0 for _ in range(n)]
 
     for i in range(n - 2, -1, -1):
-        if names[i] + result[i + 1][0] + 1 <= m:  # 뒤에 붙일 수 있는 경우
-            if result[i + 1][2]:  # 바로 다음에 있던 숫자가 마지막 줄이었던 경우
-                result[i][0] = names[i] + result[i + 1][0] + 1
-                result[i][1] = 0
-                result[i][2] = 1
-            else:  # 바로 다음에 있던 숫자가 마지막 줄이 아닌 경우
-                if (m - names[i] - result[i + 1][0] - 1) ** 2 < (m - names[i]) ** 2 + result[i][1]:
-                    result[i][0] = names[i] + result[i + 1][0] + 1
-                    result[i][1] = (m - names[i] - result[i + 1][0] - 1) ** 2
-                else:
-                    result[i][0] = names[i]
-                    result[i][1] = (m - names[i]) ** 2 + result[i][1]
-        else:
-            result[i][0] = names[i]
-            result[i][1] = (m - result[i][0]) ** 2
+        number = (m - names[i]) ** 2 + result[i + 1]
+        # names[i] 이름을 새로운 줄의 맨 처음에 위치시키는 경우
+        # names[i] 가 위치한 줄 뒤에는 names[i + 1] 로 시작하는 줄이 위치
 
-    return result
+        length = names[i]
+        for j in range(i + 1, n):
+            # names[i] 이름 뒤에 이름을 이어 붙이는 경우
+            # names[i] ~ names[j] 까지의 이름이 한 줄에 위치한 경우, 그 다음 줄에는 names[j + 1] 로 시작하는 줄이 위치
+
+            length += 1 + names[j]
+            if length > m:
+                break
+
+            if j == n - 1:  # 맨 마지막 이름까지 모두 이어 붙일 수 있다면, 무조건 0 이 된다
+                number = 0
+                break
+
+            new_number = (m - length) ** 2 + result[j + 1]
+
+            if new_number < number:
+                number = new_number
+
+        result[i] = number
+
+    return result[0]
 
 
 print(solution2())
