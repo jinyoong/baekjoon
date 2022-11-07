@@ -27,71 +27,82 @@ def rotate(circle, x, d, k, n, m):
 
 
 def change_number(circle, n, m):
-    new_circle = [[0] * m for _ in range(n)]
+    new_circle = [[-987654321] * m for _ in range(n)]
+    is_change = False
+    visited = set()
 
-    is_adj = False
-    total = 0
-    count = 0
     for r in range(n):
-        total += sum(circle[r])
-        visited = set()
         for c in range(m):
-            if not circle[r][c]:
+
+            if circle[r][c] == -987654321:
                 continue
 
+            if (r, c) in visited:
+                continue
+
+            queue = [(r, c)]
+            visited.add((r, c))
+            idx = 0
+            length = 1
+
+            while idx < length:
+                sr, sc = queue[idx]
+                idx += 1
+
+                for d in [[-1, 0], [0, -1], [1, 0], [0, 1]]:
+                    nr, nc = sr + d[0], (sc + d[1]) % m
+
+                    if nr < 0 or nr >= n:
+                        continue
+
+                    if (nr, nc) in visited:
+                        continue
+
+                    if circle[nr][nc] != circle[sr][sc]:
+                        continue
+
+                    queue.append((nr, nc))
+                    visited.add((nr, nc))
+                    is_change = True
+                    length += 1
+
+            if len(queue) == 1:
+                new_circle[r][c] = circle[r][c]
+                continue
+
+            for ele in queue:
+                qr, qc = ele
+                new_circle[qr][qc] = -987654321
+
+    if is_change:
+        return new_circle
+
+    total = count = 0
+    for r in range(n):
+        for c in range(m):
+
+            if circle[r][c] == -987654321:
+                continue
+            total += circle[r][c]
             count += 1
 
-            if c in visited:
-                continue
-
-            if circle[r][c] == circle[r][(c + 1) % m]:
-                is_adj = True
-                new_circle[r][c] = new_circle[r][(c + 1) % m] = 0
-                visited.add(c)
-                visited.add(c + 1)
-            else:
-                new_circle[r][c] = circle[r][c]
-
-    circle = [new_circle[r][:] for r in range(n)]
-
-    for c in range(m):
-        visited = set()
-        for r in range(n):
-
-            if r in visited:
-                continue
-
-            if r == n - 1:
-                if not circle[r][c]:
-                    continue
-
-                if circle[r][c] != circle[r - 1][c]:
-                    new_circle[r][c] = circle[r][c]
-            else:
-                if not circle[r][c]:
-                    continue
-
-                if circle[r][c] == circle[r + 1][c]:
-                    new_circle[r][c] = new_circle[r + 1][c] = 0
-                    is_adj = True
-                    visited.add(r)
-                    visited.add(r + 1)
-                else:
-                    new_circle[r][c] = circle[r][c]
-
-    if is_adj:
-       return new_circle
+    if count == 0:
+        return new_circle
 
     average = total / count
+
     for r in range(n):
         for c in range(m):
-            if not circle[r][c]:
+
+            if circle[r][c] == -987654321:
                 continue
 
-            if circle[r][c] < average:
-                new_circle[r][c] = circle[r][c] + 1
-            elif circle[r][c] > average:
+            if circle[r][c] - average > 0.0:
                 new_circle[r][c] = circle[r][c] - 1
+            elif circle[r][c] - average == 0.0:
+                new_circle[r][c] = circle[r][c]
+            else:
+                new_circle[r][c] = circle[r][c] + 1
 
     return new_circle
 
@@ -105,8 +116,9 @@ def solution(circle, orders, n, m):
         circle = [change_circle[i][:] for i in range(n)]
 
     for r in range(n):
-        answer += sum(circle[r])
-    print(circle)
+        for c in range(m):
+            if circle[r][c] != -987654321:
+                answer += circle[r][c]
     return answer
 
 
