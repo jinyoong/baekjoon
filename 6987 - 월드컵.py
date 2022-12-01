@@ -2,40 +2,113 @@ import sys
 
 custom_input = sys.stdin.readline
 
-lst = [list(map(int, custom_input().split())) for _ in range(4)]
+
+def solution2(idx):
+    global is_ok
+
+    if is_ok:
+        return
+
+    for k in range(6):
+        for t in range(3):
+            if result[k][t] > countries[k][t]:
+                return
+
+    if idx == 6:
+        if result == countries:
+            is_ok = True
+        return
+
+    country = countries[idx]
+    win, draw, lose = country[0], country[1], country[2]
+
+    if win + draw + lose != 5:
+        return
+
+    collections = set()
+
+    def collection(cidx, w, d, l, collection_result):
+        nonlocal collections
+
+        if w == d == l == 0:
+            collections.add(tuple(collection_result))
+
+        for ci in range(6):
+
+            if ci == cidx:
+                continue
+
+            if collection_result[ci] != 0:
+                continue
+
+            if w:
+                collection_result[ci] = 1
+                collection(cidx, w - 1, d, l, collection_result)
+                collection_result[ci] = 0
+
+            if d:
+                collection_result[ci] = 2
+                collection(cidx, w, d - 1, l, collection_result)
+                collection_result[ci] = 0
+
+            if l:
+                collection_result[ci] = 3
+                collection(cidx, w, d, l - 1, collection_result)
+                collection_result[ci] = 0
+
+        return result
+
+    collection(idx, win, draw, lose, [0, 0, 0, 0, 0, 0])
+
+    for collection_element in collections:
+        for j, ele in enumerate(collection_element):
+
+            if ele == 0:
+                continue
+            elif ele == 1:
+                result[j][2] += 1
+            elif ele == 2:
+                result[j][1] += 1
+            else:
+                result[j][0] += 1
+
+        solution2(idx + 1)
+
+        for j, ele in enumerate(collection_element):
+
+            if ele == 0:
+                continue
+            elif ele == 1:
+                result[j][2] -= 1
+            elif ele == 2:
+                result[j][1] -= 1
+            else:
+                result[j][0] -= 1
 
 
-def solution(countries):
-    answer = [0, 0, 0, 0]
+answer = [0, 0, 0, 0]
+for ai in range(4):
+    countries = []
+    lst = list(map(int, custom_input().split()))
+    for i in range(0, 18, 3):
+        temp = [lst[i], lst[i + 1], lst[i + 2]]
+        countries.append(temp)
 
-    for idx, country in enumerate(countries):
-        country_result = [0, 0, 0]
-        draw_count = 0
-        temp = -1
+    result = [[0, 0, 0] for _ in range(6)]
+    is_ok = False
+    solution2(0)
 
-        for i in range(0, 18, 3):
-            win, draw, lose = country[i], country[i + 1], country[i + 2]
-            temp *= -1
+    if is_ok:
+        answer[ai] = 1
+    else:
+        answer[ai] = 0
 
-            # print("{}번째의 나라의 승 : {}, 무 : {}, 패 : {}".format(i % 3 + 1, win, draw, lose))
-
-            if win + draw + lose >= 6:
-                break
-
-            country_result[0] += win
-            country_result[1] += temp * draw
-            country_result[2] += lose
-            draw_count += draw
-
-        # print(country_result)
-
-        if draw_count % 2:
-            continue
-
-        if country_result[0] == country_result[2] and country_result[1] == 0 and draw_count // 2 + country_result[0] == 15:
-            answer[idx] = 1
-
-    return answer
+print(*answer)
 
 
-print(*solution(lst))
+"""
+3 1 1 1 0 4 1 1 3 3 0 2 3 0 2 3 0 2
+3 1 1 1 0 4 1 1 3 3 0 2 3 0 2 3 0 2
+3 1 1 1 0 4 1 1 3 3 0 2 3 0 2 3 0 2
+3 1 1 1 0 4 1 1 3 3 0 2 3 0 2 3 0 2
+"""
