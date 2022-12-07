@@ -25,42 +25,36 @@ def solution2(idx):
     if win + draw + lose != 5:
         return
 
-    collections = set()
+    collections2 = set()
 
-    def collection(cidx, w, d, l, collection_result):
-        nonlocal collections
+    def collection2(cidx, ci, w, d, l, collection_result):
+        nonlocal collections2
 
-        if w == d == l == 0:
-            collections.add(tuple(collection_result))
+        if ci == cidx:
+            collection2(cidx, ci + 1, w, d, l, collection_result)
+            return
 
-        for ci in range(6):
+        if ci == 6 or w + d + l == 0:
+            collections2.add(tuple(collection_result))
 
-            if ci == cidx:
-                continue
+        if w:
+            collection_result[ci] = 1
+            collection2(cidx, ci + 1, w - 1, d, l, collection_result)
+            collection_result[ci] = 0
 
-            if collection_result[ci] != 0:
-                continue
+        if d:
+            collection_result[ci] = 2
+            collection2(cidx, ci + 1, w, d - 1, l, collection_result)
+            collection_result[ci] = 0
 
-            if w:
-                collection_result[ci] = 1
-                collection(cidx, w - 1, d, l, collection_result)
-                collection_result[ci] = 0
+        if l:
+            collection_result[ci] = 3
+            collection2(cidx, ci + 1, w, d, l - 1, collection_result)
+            collection_result[ci] = 0
 
-            if d:
-                collection_result[ci] = 2
-                collection(cidx, w, d - 1, l, collection_result)
-                collection_result[ci] = 0
+    collection2(idx, 0, win, draw, lose, [0, 0, 0, 0, 0, 0])
 
-            if l:
-                collection_result[ci] = 3
-                collection(cidx, w, d, l - 1, collection_result)
-                collection_result[ci] = 0
-
-        return result
-
-    collection(idx, win, draw, lose, [0, 0, 0, 0, 0, 0])
-
-    for collection_element in collections:
+    for collection_element in collections2:
         for j, ele in enumerate(collection_element):
 
             if ele == 0:
@@ -105,6 +99,39 @@ for ai in range(4):
 
 print(*answer)
 
+
+"""
+def collection(cidx, w, d, l, collection_result):
+    nonlocal collections
+
+    if w == d == l == 0:
+        collections.add(tuple(collection_result))
+
+    for ci in range(6):
+
+        if ci == cidx:
+            continue
+
+        if collection_result[ci] != 0:
+            continue
+
+        if w:
+            collection_result[ci] = 1
+            collection(cidx, w - 1, d, l, collection_result)
+            collection_result[ci] = 0
+
+        if d:
+            collection_result[ci] = 2
+            collection(cidx, w, d - 1, l, collection_result)
+            collection_result[ci] = 0
+
+        if l:
+            collection_result[ci] = 3
+            collection(cidx, w, d, l - 1, collection_result)
+            collection_result[ci] = 0
+
+    return result
+"""
 
 """
 3 1 1 1 0 4 1 1 3 3 0 2 3 0 2 3 0 2
